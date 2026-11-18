@@ -21,21 +21,6 @@
 
             <div class="login-body">
                 <form id="loginForm">
-                    <!-- Show Registered Users Button -->
-                    <div style="text-align: center; margin-bottom: 1rem;">
-                        <button type="button" id="showUsersBtn" style="padding: 6px 16px; background: var(--secondary); color: white; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
-                            <i class="fas fa-users"></i> Show Registered Users
-                        </button>
-                    </div>
-                    
-                    <!-- Registered Users Section -->
-                    <div id="registeredUsersSection" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; display: none;">
-                        <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 0.9rem;">
-                            <i class="fas fa-users"></i> Registered Users (Click to Login)
-                        </h4>
-                        <div id="usersList" style="max-height: 120px; overflow-y: auto;"></div>
-                    </div>
-                    
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <div class="input-container">
@@ -55,32 +40,14 @@
                         </div>
                     </div>
                     
-                    <div class="form-options">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="remember">
-                            <span class="checkmark"></span>
-                            Remember me
-                        </label>
-                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    <div class="form-options" style="justify-content: flex-end;">
+                        <a href="mailto:krushnacjadhav081@gmail.com" class="forgot-password">Need help?</a>
                     </div>
                     
                     <button type="submit" class="btn login-btn">
                         <i class="fas fa-sign-in-alt"></i> Sign In
                     </button>
                 </form>
-                
-                <div class="divider">
-                    <span>or</span>
-                </div>
-                
-                <div class="social-login">
-                    <button class="btn social-btn google-btn">
-                        <i class="fab fa-google"></i> Continue with Google
-                    </button>
-                    <button class="btn social-btn facebook-btn">
-                        <i class="fab fa-facebook-f"></i> Continue with Facebook
-                    </button>
-                </div>
                 
                 <div class="signup-link">
                     <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
@@ -98,7 +65,7 @@
                             <span style="color: #7b1fa2;">john123</span> (Premium Member)
                         </div>
                         <div style="padding-top: 0.5rem; border-top: 1px solid #ce93d8; font-size: 0.75rem;">
-                            <strong>💡 Click "Show Registered Users" then click the user for instant login!</strong>
+                            <strong>Demo only.</strong> This account and all data stay in this browser.
                         </div>
                     </div>
                 </div>
@@ -115,16 +82,16 @@
 
         <div class="stats">
             <div class="stat">
-                <h3>5000+</h3>
-                <p>Active Users</p>
+                <h3>DEMO</h3>
+                <p>Static project</p>
             </div>
             <div class="stat">
-                <h3>300+</h3>
-                <p>Fitness Partners</p>
+                <h3>LOCAL</h3>
+                <p>Browser-only data</p>
             </div>
             <div class="stat">
-                <h3>25+</h3>
-                <p>Cities Covered</p>
+                <h3>OFF</h3>
+                <p>Real payments</p>
             </div>
         </div>
     </div>
@@ -132,7 +99,6 @@
 
 
     <script src="js/demo-cloud.js"></script>
-    <script src="js/database.js"></script>
     <script src="js/main.js"></script>
     <script src="js/login.js"></script>
 </body>

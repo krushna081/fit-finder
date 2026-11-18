@@ -124,7 +124,7 @@ function setupChangePasswordForm() {
             e.preventDefault();
             
             if (!dbReady || !currentUser) {
-                showSettingsMessage('Database not ready. Please refresh the page.', 'error');
+                showSettingsMessage('Demo storage not ready. Please refresh the page.', 'error');
                 return;
             }
 
@@ -212,7 +212,7 @@ function setupChangePasswordForm() {
 async function updateUserPassword(email, newPassword) {
     try {
         if (!window.DemoCloudDB) {
-            return { success: false, message: 'Database not available' };
+            return { success: false, message: 'Demo storage not available' };
         }
 
         const users = window.DemoCloudDB.getCloudUsers();
@@ -242,7 +242,7 @@ async function updateUserPassword(email, newPassword) {
             
             return { success: true, message: 'Password updated successfully' };
         } else {
-            return { success: false, message: 'Failed to save password change to database' };
+            return { success: false, message: 'Failed to save password change to demo storage' };
         }
 
     } catch (error) {
@@ -329,12 +329,12 @@ function showDeleteConfirmation() {
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             
-            <h2 style="color: #dc3545; margin-bottom: 1rem;">Delete Account</h2>
+            <h2 style="color: #dc3545; margin-bottom: 1rem;">Delete Local Demo Account</h2>
             
             <p style="color: #666; margin-bottom: 1.5rem; line-height: 1.6;">
-                Are you absolutely sure you want to delete your account?<br>
+                Are you sure you want to delete this local demo account?<br>
                 <strong>This action cannot be undone.</strong><br><br>
-                All your data including:
+                The following demo data in this browser:
             </p>
             
             <ul style="text-align: left; color: #666; margin-bottom: 1.5rem; padding-left: 2rem;">
@@ -345,7 +345,7 @@ function showDeleteConfirmation() {
             </ul>
             
             <p style="color: #dc3545; font-weight: bold; margin-bottom: 2rem;">
-                Will be permanently deleted!
+                Will be permanently removed from this browser.
             </p>
             
             <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -370,7 +370,7 @@ function showDeleteConfirmation() {
                     cursor: pointer;
                     font-size: 1rem;
                 ">
-                    <i class="fas fa-trash-alt"></i> Yes, Delete My Account
+                    <i class="fas fa-trash-alt"></i> Yes, Delete Local Account
                 </button>
             </div>
         </div>
@@ -434,8 +434,8 @@ window.proceedWithDeletion = async function() {
         const saved = window.DemoCloudDB.saveCloudUsers(filteredUsers);
         
         if (saved) {
-            // Clear local storage
-            localStorage.clear();
+            // Clear only the current session; other local demo accounts stay intact.
+            clearSession();
             
             // Show success message
             modalContent.innerHTML = `
@@ -468,7 +468,7 @@ window.proceedWithDeletion = async function() {
             }, 3000);
 
         } else {
-            throw new Error('Failed to delete account from database');
+            throw new Error('Failed to delete account from demo storage');
         }
 
     } catch (error) {
@@ -529,12 +529,19 @@ function showSettingsMessage(message, type) {
         animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     `;
     
-    messageDiv.innerHTML = `
-        <div style="display: flex; align-items: center;">
-            <i class="${style.icon}" style="margin-right: 12px; font-size: 1.2rem;"></i>
-            <span>${message}</span>
-        </div>
-    `;
+    const content = document.createElement('div');
+    content.style.cssText = 'display: flex; align-items: center;';
+
+    const icon = document.createElement('i');
+    icon.className = style.icon;
+    icon.style.cssText = 'margin-right: 12px; font-size: 1.2rem;';
+    icon.setAttribute('aria-hidden', 'true');
+
+    const text = document.createElement('span');
+    text.textContent = message;
+
+    content.append(icon, text);
+    messageDiv.replaceChildren(content);
     
     // Add animation
     if (!document.getElementById('settings-message-animations')) {
@@ -564,9 +571,15 @@ function showSettingsMessage(message, type) {
     }, 5000);
 }
 
-// Logout function (same as home.html)
+// Remove only the current session; never erase all browser-only demo accounts.
+function clearSession() {
+    ['isLoggedIn', 'userEmail', 'userName', 'userId', 'membershipType', 'FitFindrSession']
+        .forEach(key => localStorage.removeItem(key));
+}
+
+// Logout function
 function logout() {
-    localStorage.clear();
+    clearSession();
     showSettingsMessage('Logged out successfully!', 'success');
     setTimeout(() => {
         window.location.href = 'login.html';

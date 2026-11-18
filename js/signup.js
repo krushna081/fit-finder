@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             e.preventDefault();
             
             if (!dbReady) {
-                alert('Database not ready. Please wait and try again.');
+                alert('Demo storage not ready. Please wait and try again.');
                 return;
             }
             
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
             
             if (!terms) {
-                alert('Please accept the Terms & Conditions');
+                alert('Please confirm this is a browser-only demo account.');
                 return;
             }
             
@@ -286,7 +286,11 @@ function showEmailError(message) {
         transform: translateY(-10px);
         animation: errorSlideIn 0.3s ease-out forwards;
     `;
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle" style="animation: shake 0.5s ease-in-out;"></i> ${message}`;
+    const errorIcon = document.createElement('i');
+    errorIcon.className = 'fas fa-exclamation-triangle';
+    errorIcon.setAttribute('aria-hidden', 'true');
+    errorIcon.style.animation = 'shake 0.5s ease-in-out';
+    errorDiv.replaceChildren(errorIcon, document.createTextNode(' ' + message));
     
     // Add shake animation for icon
     if (!document.getElementById('email-error-animations')) {
@@ -368,14 +372,15 @@ function showAnimatedMessage(title, message, type) {
         animation: ${style.animation};
     `;
     
-    messageDiv.innerHTML = `
-        <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;">
-            ${title}
-        </div>
-        <div style="font-size: 0.95rem; opacity: 0.9; line-height: 1.4;">
-            ${message}
-        </div>
-    `;
+    const titleEl = document.createElement('div');
+    titleEl.style.cssText = 'font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;';
+    titleEl.textContent = title;
+
+    const messageEl = document.createElement('div');
+    messageEl.style.cssText = 'font-size: 0.95rem; opacity: 0.9; line-height: 1.4;';
+    messageEl.textContent = message;
+
+    messageDiv.replaceChildren(titleEl, messageEl);
     
     // Add animation styles if not exists
     if (!document.getElementById('signup-message-animations')) {

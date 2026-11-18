@@ -1,5 +1,5 @@
-// Demo Cross-Device Login System
-// Uses localStorage with sync simulation for demonstration
+// Local demo account store (localStorage only)
+// Uses localStorage as a browser-only demo store.
 
 class DemoCloudDB {
     constructor() {
@@ -9,8 +9,8 @@ class DemoCloudDB {
     }
 
     async init() {
-        console.log('🌐 Demo Cloud Database initialized');
-        console.log('📱 This simulates cross-device login using localStorage');
+        console.log('🌐 Local demo store initialized');
+        console.log('📱 This is a browser-only localStorage demo');
         
         // Initialize demo data if none exists
         if (!localStorage.getItem(this.storageKey)) {
@@ -21,7 +21,7 @@ class DemoCloudDB {
         return true;
     }
 
-    // Hash password for security
+    // Deterministic demo hash (not production password storage)
     async hashPassword(password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(password + 'FitFindrDemoSalt2023');
@@ -30,26 +30,26 @@ class DemoCloudDB {
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // Get users from "cloud" (localStorage)
+    // Get users from localStorage
     getCloudUsers() {
         try {
             const users = JSON.parse(localStorage.getItem(this.storageKey) || '[]');
             return users;
         } catch (error) {
-            console.error('Error reading cloud users:', error);
+            console.error('Error reading demo users:', error);
             return [];
         }
     }
 
-    // Save users to "cloud" (localStorage)
+    // Save users to localStorage
     saveCloudUsers(users) {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(users));
             localStorage.setItem(this.syncKey, new Date().toISOString());
-            console.log('💾 Data synced to "cloud" (localStorage)');
+            console.log('💾 Demo data saved to localStorage');
             return true;
         } catch (error) {
-            console.error('Error saving to cloud:', error);
+            console.error('Error saving demo data:', error);
             return false;
         }
     }
@@ -89,7 +89,7 @@ class DemoCloudDB {
             users.push(newUser);
             this.saveCloudUsers(users);
 
-            console.log('✅ User registered in demo cloud system');
+            console.log('✅ User registered in the local demo store');
             return { success: true, userId: newUser.id, user: newUser };
 
         } catch (error) {
@@ -131,7 +131,7 @@ class DemoCloudDB {
                 users[userIndex] = user;
                 this.saveCloudUsers(users);
 
-                console.log('🎉 Cross-device login successful!');
+                console.log('🎉 Demo login successful!');
                 return { 
                     success: true, 
                     user: {
@@ -180,16 +180,16 @@ class DemoCloudDB {
         }));
     }
 
-    // Show cross-device status
+    // Show local demo status
     showCrossDeviceStatus() {
         const users = this.getCloudUsers();
         const lastSync = localStorage.getItem(this.syncKey);
         
-        console.log('🌐 Demo Cross-Device Status:');
+        console.log('🌐 Demo local storage status:');
         console.log(`📊 Total Users: ${users.length}`);
         console.log(`🕒 Last Sync: ${lastSync}`);
-        console.log('💡 This demo uses localStorage to simulate cloud storage');
-        console.log('🔄 In production, this would sync across actual devices');
+        console.log('💡 Accounts are stored only in this browser via localStorage');
+        console.log('🔒 This demo does not sync across devices');
         
         return {
             totalUsers: users.length,
@@ -198,66 +198,7 @@ class DemoCloudDB {
         };
     }
 
-    // Simulate device sync
-    simulateDeviceSync() {
-        const status = this.showCrossDeviceStatus();
-        
-        // Show demo message
-        const message = document.createElement('div');
-        message.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            z-index: 10000;
-            font-size: 0.9rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            max-width: 300px;
-            animation: slideInRight 0.5s ease-out;
-        `;
-        
-        message.innerHTML = `
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i>
-                <strong>Demo Cloud Sync</strong>
-            </div>
-            <div style="font-size: 0.85rem; opacity: 0.9;">
-                📱 ${status.totalUsers} users synced<br>
-                🕒 Last sync: just now<br>
-                💡 Ready for cross-device login!
-            </div>
-        `;
-        
-        // Add animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        document.body.appendChild(message);
-        
-        // Auto-remove after 4 seconds
-        setTimeout(() => {
-            message.style.animation = 'slideInRight 0.5s ease-out reverse';
-            setTimeout(() => {
-                if (document.body.contains(message)) {
-                    document.body.removeChild(message);
-                }
-                if (document.head.contains(style)) {
-                    document.head.removeChild(style);
-                }
-            }, 500);
-        }, 4000);
-    }
-
-    // Check if ready for cross-device
+    // Check if the demo store is ready
     isReady() {
         return true;
     }
@@ -267,6 +208,30 @@ class DemoCloudDB {
         localStorage.removeItem(this.storageKey);
         localStorage.removeItem(this.syncKey);
         console.log('🔄 Demo data reset - fresh start!');
+    }
+
+    // Ensure the seeded demo account exists without deleting other local accounts.
+    async ensureDemoUser() {
+        const users = this.getCloudUsers();
+        const existingDemo = users.find(user => user.email === 'john@demo.com');
+        if (existingDemo) return existingDemo;
+
+        const result = await this.registerUser({
+            fullName: 'John Smith',
+            email: 'john@demo.com',
+            password: 'john123',
+            membershipType: 'premium'
+        });
+
+        if (!result.success) return null;
+
+        const updatedUsers = this.getCloudUsers();
+        const demoUser = updatedUsers.find(user => user.email === 'john@demo.com');
+        if (demoUser) {
+            demoUser.membershipType = 'premium';
+            this.saveCloudUsers(updatedUsers);
+        }
+        return demoUser || null;
     }
 
     // Force create test users (for debugging)
@@ -317,57 +282,27 @@ class DemoCloudDB {
     }
 }
 
-// Initialize demo cloud database
+// Initialize demo store
 const demoCloudDB = new DemoCloudDB();
 
 // Export for use
 window.DemoCloudDB = demoCloudDB;
 
-// Add global reset function for debugging
-window.resetDemoUsers = async function() {
-    console.log('🔄 Manually resetting demo users...');
-    await demoCloudDB.forceCreateTestUsers();
-    console.log('✅ Demo users reset complete! Try logging in now.');
-};
-
-// Add global function to check users
-window.checkDemoUsers = function() {
-    const users = demoCloudDB.getCloudUsers();
-    console.log('📋 Current demo users:', users);
-    console.log('📊 Total users:', users.length);
-    users.forEach(user => {
-        console.log(`   • ${user.fullName} (${user.email}) - ${user.membershipType}`);
-    });
-    return users;
-};
-
 // Auto-initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Initializing demo cloud database...');
+    console.log('🚀 Initializing local demo store...');
     await demoCloudDB.init();
     
     // Check current users
     const users = demoCloudDB.getCloudUsers();
     console.log(`📊 Found ${users.length} existing users`);
     
-    // Always ensure we have test users (force create if needed)
+    // Ensure the demo account exists without deleting any local accounts.
     if (users.length === 0) {
-        console.log('🔧 No users found, creating test users...');
+        console.log('🔧 No users found, creating demo account...');
         await demoCloudDB.forceCreateTestUsers();
     } else {
-        // Verify john@demo.com exists and can authenticate
-        try {
-            const johnAuth = await demoCloudDB.authenticateUser('john@demo.com', 'john123');
-            if (!johnAuth.success) {
-                console.log('🔄 John authentication failed, recreating users...');
-                await demoCloudDB.forceCreateTestUsers();
-            } else {
-                console.log('✅ Existing users verified successfully');
-            }
-        } catch (error) {
-            console.log('🔄 User verification failed, recreating users...');
-            await demoCloudDB.forceCreateTestUsers();
-        }
+        await demoCloudDB.ensureDemoUser();
     }
     
     // Final verification
@@ -381,9 +316,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.log('   • No users found');
     }
-    
-    // Show status after 2 seconds
-    setTimeout(() => {
-        demoCloudDB.simulateDeviceSync();
-    }, 2000);
 });
